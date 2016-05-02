@@ -81,7 +81,7 @@ CMainWindow::CMainWindow(QWidget *parent) :
 		ui->_displayWidget->update();
 	});
 
-	connect(ui->_btnConnect, &QPushButton::toggled, [this](bool connect){
+	connect(ui->_btnConnect, &QPushButton::clicked, [this](bool connect){
 		ui->_btnConnect->setChecked(!connect);
 		if (connect)
 			connectToCamera();
