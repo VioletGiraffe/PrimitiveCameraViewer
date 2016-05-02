@@ -99,8 +99,8 @@ protected:
 	bool eventFilter(QObject *, QEvent *) override;
 
 private:
-	void connectToCamera();
-	void disconnectFromCamera();
+	void startCamera();
+	void stopCamera();
 
 private:
 	Ui::CMainWindow *ui;

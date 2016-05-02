@@ -50,9 +50,9 @@ CMainWindow::CMainWindow(QWidget *parent) :
 				if (!analyzeFrame(frame, ui->_threshold->value()))
 				{
 					// Disconnect and schedule re-check
-					disconnectFromCamera();
-					QTimer::singleShot(7000, [this](){
-						connectToCamera();
+					stopCamera();
+					QTimer::singleShot(10000, [this](){
+						startCamera();
 					});
 				}
 			}
@@ -62,15 +62,15 @@ CMainWindow::CMainWindow(QWidget *parent) :
 				static uint32_t frameCounter = 0;
 				++frameCounter;
 
-				if (frameCounter > 50)
+				if (frameCounter > 30)
 				{
 					frameCounter = 0;
 					if (!analyzeFrame(frame, ui->_threshold->value()))
 					{
 						// Diisconnect and schedule re-check
-						disconnectFromCamera();
-						QTimer::singleShot(7000, [this](){
-							connectToCamera();
+						stopCamera();
+						QTimer::singleShot(10000, [this](){
+							startCamera();
 						});
 					}
 				}
@@ -84,17 +84,17 @@ CMainWindow::CMainWindow(QWidget *parent) :
 	connect(ui->_btnConnect, &QPushButton::clicked, [this](bool connect){
 		ui->_btnConnect->setChecked(!connect);
 		if (connect)
-			connectToCamera();
+			startCamera();
 		else
-			disconnectFromCamera();
+			stopCamera();
 	});
 
-	connectToCamera();
+	startCamera();
 }
 
 CMainWindow::~CMainWindow()
 {
-	disconnectFromCamera();
+	stopCamera();
 	delete ui;
 }
 
@@ -109,52 +109,56 @@ bool CMainWindow::eventFilter(QObject* /*object*/, QEvent* event)
 		else
 			painter.fillRect(widget->geometry(), Qt::darkGray);
 		painter.end();
+
+		return true;
 	}
 
 	return false;
 }
 
-void CMainWindow::connectToCamera()
+void CMainWindow::startCamera()
 {
-	const auto cameras = QCameraInfo::availableCameras();
-	if (cameras.empty())
-		return;
+	if (!_camera)
+	{
+		const auto cameras = QCameraInfo::availableCameras();
+		if (cameras.empty())
+			return;
 
-	const auto& cameraInfo = cameras.front();
-	if (cameraInfo.isNull())
-		return;
+		const auto& cameraInfo = cameras.front();
+		if (cameraInfo.isNull())
+			return;
 
+		qDebug() << "Creating the camera" << cameraInfo.description();
+		_camera = std::make_shared<QCamera>(cameraInfo);
+		_camera->setViewfinder(&_frameGrabber);
 
-	qDebug() << "Creating the camera" << cameraInfo.description();
-	_camera = std::make_shared<QCamera>(cameraInfo);
-	_camera->setViewfinder(&_frameGrabber);
+		qDebug() << "Connecting to the camera";
+		connect(_camera.get(), &QCamera::stateChanged, [this](const QCamera::State state){
+			if (state == QCamera::ActiveState)
+			{
+				ui->_btnConnect->setChecked(true);
+				setWindowTitle("Connected");
+			}
+			else
+			{
+				ui->_btnConnect->setChecked(false);
+				setWindowTitle("Not Connected");
+			}
+		});
+	}
 
-	qDebug() << "Connecting to the camera";
-	connect(_camera.get(), &QCamera::stateChanged, [this](const QCamera::State state){
-		if (state == QCamera::ActiveState)
-		{
-			ui->_btnConnect->setChecked(true);
-			setWindowTitle("Connected");
-		}
-		else
-		{
-			ui->_btnConnect->setChecked(false);
-			setWindowTitle("Not Connected");
-		}
-	});
-
+	_camera->load();
 	_camera->start();
 }
 
-void CMainWindow::disconnectFromCamera()
+void CMainWindow::stopCamera()
 {
 	if (_camera)
 	{
 		_camera->stop();
-		_camera->setViewfinder((QAbstractVideoSurface*)nullptr);
+		_camera->unload();
 		_frame = QImage();
 	}
 
-	_camera.reset();
 	setWindowTitle("Not Connected");
 }
