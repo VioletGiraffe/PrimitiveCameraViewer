@@ -43,7 +43,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="_btnEnableProbing">
+       <widget class="QCheckBox" name="_btnEnableProbing">
         <property name="text">
          <string>Probing</string>
         </property>

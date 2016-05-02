@@ -173,6 +173,8 @@ void CMainWindow::startCamera()
 		_camera->load();
 		_camera->start();
 	}
+
+	_frameScanFilter.reset();
 }
 
 void CMainWindow::stopCamera()
