@@ -42,6 +42,7 @@ CMainWindow::CMainWindow(QWidget *parent) :
 	ui->_displayWidget->installEventFilter(this);
 
 	connect(&_frameGrabber, &ProxyVideoSurface::frameReceived, [this](QImage frame) {
+
 		if (!frame.isNull() && ui->_btnEnableProbing->isChecked())
 		{
 			// This is the first frame upon connecting to the camera
@@ -54,6 +55,8 @@ CMainWindow::CMainWindow(QWidget *parent) :
 					QTimer::singleShot(10000, [this](){
 						startCamera();
 					});
+
+					return;
 				}
 			}
 			else // Not the first frame - apparently, we're streaming a live picture
@@ -72,6 +75,8 @@ CMainWindow::CMainWindow(QWidget *parent) :
 						QTimer::singleShot(10000, [this](){
 							startCamera();
 						});
+
+						return;
 					}
 				}
 			}
@@ -169,6 +174,7 @@ void CMainWindow::stopCamera()
 		_camera->stop();
 		_camera->unload();
 		_frame = QImage();
+		ui->_displayWidget->update();
 	}
 
 	setWindowTitle("Not Connected");
