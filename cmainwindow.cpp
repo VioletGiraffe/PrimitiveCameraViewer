@@ -48,7 +48,8 @@ CMainWindow::CMainWindow(QWidget *parent) :
 			// This is the first frame upon connecting to the camera
 			if (_frame.isNull())
 			{
-				if (!analyzeFrame(frame, ui->_threshold->value()))
+				const auto frameScanResult = _frameScanFilter.processSample(analyzeFrame(frame, ui->_threshold->value()));
+				if (frameScanResult == Filter::Invalid)
 				{
 					// Disconnect and schedule re-check
 					stopCamera();
@@ -58,6 +59,8 @@ CMainWindow::CMainWindow(QWidget *parent) :
 
 					return;
 				}
+				else if (frameScanResult == Filter::Undefined)
+					return; // To avoid assigning _frame, which would prevent the following frames from being scanned
 			}
 			else // Not the first frame - apparently, we're streaming a live picture
 				 // Avoid checking every single frame
