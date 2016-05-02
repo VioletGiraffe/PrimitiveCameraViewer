@@ -110,7 +110,13 @@ bool CMainWindow::eventFilter(QObject* /*object*/, QEvent* event)
 		QWidget * widget = ui->_displayWidget;
 		QPainter painter(widget);
 		if (!_frame.isNull())
-			painter.drawImage(widget->geometry(), _frame);
+		{
+			const QSize scaledImagesize = _frame.size().scaled(widget->size(), Qt::KeepAspectRatio);
+			QRect imageDrawRect = widget->geometry();
+			imageDrawRect.setSize(scaledImagesize);
+			imageDrawRect.translate((widget->width() - scaledImagesize.width()) / 2, (widget->height() - scaledImagesize.height()) / 2);
+			painter.drawImage(imageDrawRect, _frame);
+		}
 		else
 			painter.fillRect(widget->geometry(), Qt::darkGray);
 		painter.end();
