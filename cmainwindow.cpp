@@ -7,7 +7,7 @@
 #include <QTime>
 #include <QTimer>
 
-inline bool analyzeFrame(const QImage& frame)
+inline bool analyzeFrame(const QImage& frame, unsigned int threshold)
 {
 	if (frame.depth() != 32)
 		return true;
@@ -30,7 +30,7 @@ inline bool analyzeFrame(const QImage& frame)
 
 	const auto avgValue = pixelsValueSum / ((uint64_t) w / sampleStrideW * (uint64_t) h / sampleStrideH * 3ull);
 	qDebug() << "Frame metric:" << avgValue;
-	return avgValue >= 10;
+	return avgValue >= threshold;
 }
 
 CMainWindow::CMainWindow(QWidget *parent) :
@@ -39,17 +39,15 @@ CMainWindow::CMainWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	QWidget * displayWidget = new QWidget(this);
-	displayWidget->installEventFilter(this);
-	setCentralWidget(displayWidget);
+	ui->_displayWidget->installEventFilter(this);
 
-	connect(&_frameGrabber, &ProxyVideoSurface::frameReceived, [this, displayWidget](QImage frame) {
-		if (!frame.isNull())
+	connect(&_frameGrabber, &ProxyVideoSurface::frameReceived, [this](QImage frame) {
+		if (!frame.isNull() && ui->_btnEnableProbing->isChecked())
 		{
 			// This is the first frame upon connecting to the camera
 			if (_frame.isNull())
 			{
-				if (!analyzeFrame(frame))
+				if (!analyzeFrame(frame, ui->_threshold->value()))
 				{
 					// Disconnect and schedule re-check
 					disconnectFromCamera();
@@ -67,7 +65,7 @@ CMainWindow::CMainWindow(QWidget *parent) :
 				if (frameCounter > 50)
 				{
 					frameCounter = 0;
-					if (!analyzeFrame(frame))
+					if (!analyzeFrame(frame, ui->_threshold->value()))
 					{
 						// Diisconnect and schedule re-check
 						disconnectFromCamera();
@@ -80,7 +78,15 @@ CMainWindow::CMainWindow(QWidget *parent) :
 		}
 
 		_frame = frame;
-		displayWidget->update();
+		ui->_displayWidget->update();
+	});
+
+	connect(ui->_btnConnect, &QPushButton::toggled, [this](bool connect){
+		ui->_btnConnect->setChecked(!connect);
+		if (connect)
+			connectToCamera();
+		else
+			disconnectFromCamera();
 	});
 
 	connectToCamera();
@@ -92,11 +98,11 @@ CMainWindow::~CMainWindow()
 	delete ui;
 }
 
-bool CMainWindow::eventFilter(QObject* object, QEvent* event)
+bool CMainWindow::eventFilter(QObject* /*object*/, QEvent* event)
 {
-	QWidget * widget = dynamic_cast<QWidget*>(object);
-	if (event->type() == QEvent::Paint && widget)
+	if (event->type() == QEvent::Paint)
 	{
+		QWidget * widget = ui->_displayWidget;
 		QPainter painter(widget);
 		if (!_frame.isNull())
 			painter.drawImage(widget->geometry(), _frame);
@@ -127,10 +133,14 @@ void CMainWindow::connectToCamera()
 	connect(_camera.get(), &QCamera::stateChanged, [this](const QCamera::State state){
 		if (state == QCamera::ActiveState)
 		{
+			ui->_btnConnect->setChecked(true);
 			setWindowTitle("Connected");
 		}
 		else
+		{
+			ui->_btnConnect->setChecked(false);
 			setWindowTitle("Not Connected");
+		}
 	});
 
 	_camera->start();
