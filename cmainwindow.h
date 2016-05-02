@@ -99,6 +99,10 @@ protected:
 	bool eventFilter(QObject *, QEvent *) override;
 
 private:
+	void connectToCamera();
+	void disconnectFromCamera();
+
+private:
 	Ui::CMainWindow *ui;
 
 	ProxyVideoSurface _frameGrabber;
