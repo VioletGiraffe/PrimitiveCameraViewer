@@ -10,6 +10,9 @@
 *.sln
 *.filters
 ui_*.h
+installer/binaries
+installer/*.exe
+installer/set_qt_paths.bat
 
 
 # User-specific files (MonoDevelop/Xamarin Studio)
