@@ -152,5 +152,6 @@ private:
 	std::shared_ptr<QCamera> _camera;
 	QImage _frame;
 	Filter _frameScanFilter;
+	int _currentFrameContentsMetric = -1;
 };
 

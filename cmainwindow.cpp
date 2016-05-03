@@ -7,7 +7,7 @@
 #include <QTime>
 #include <QTimer>
 
-inline bool analyzeFrame(const QImage& frame, unsigned int threshold)
+inline int analyzeFrame(const QImage& frame)
 {
 	if (frame.depth() != 32)
 		return true;
@@ -28,9 +28,10 @@ inline bool analyzeFrame(const QImage& frame, unsigned int threshold)
 		}
 	}
 
-	const auto avgValue = pixelsValueSum / ((uint64_t) w / sampleStrideW * (uint64_t) h / sampleStrideH * 3ull);
-	qDebug() << "Frame metric:" << avgValue;
-	return avgValue >= threshold;
+	
+	const int result = (int)(pixelsValueSum / ((uint64_t) w / sampleStrideW * (uint64_t) h / sampleStrideH * 3ull));
+	qDebug() << "Frame metric:" << result;
+	return result;
 }
 
 CMainWindow::CMainWindow(QWidget *parent) :
@@ -38,6 +39,9 @@ CMainWindow::CMainWindow(QWidget *parent) :
 	ui(new Ui::CMainWindow)
 {
 	ui->setupUi(this);
+
+	connect(ui->_threshold, &QSlider::valueChanged, ui->_lblThresholdValue, (void (QLabel::*)(int))&QLabel::setNum);
+	ui->_lblThresholdValue->setNum(ui->_threshold->value());
 
 	ui->_displayWidget->installEventFilter(this);
 
@@ -48,7 +52,8 @@ CMainWindow::CMainWindow(QWidget *parent) :
 			// This is the first frame upon connecting to the camera
 			if (_frame.isNull())
 			{
-				const auto frameScanResult = _frameScanFilter.processSample(analyzeFrame(frame, ui->_threshold->value()));
+				_currentFrameContentsMetric = analyzeFrame(frame);
+				const auto frameScanResult = _frameScanFilter.processSample(_currentFrameContentsMetric >= ui->_threshold->value());
 				if (frameScanResult == Filter::Invalid)
 				{
 					// Disconnect and schedule re-check
@@ -71,7 +76,8 @@ CMainWindow::CMainWindow(QWidget *parent) :
 				if (frameCounter > 30)
 				{
 					frameCounter = 0;
-					if (!analyzeFrame(frame, ui->_threshold->value()))
+					_currentFrameContentsMetric = analyzeFrame(frame);
+					if (_currentFrameContentsMetric < ui->_threshold->value())
 					{
 						// Diisconnect and schedule re-check
 						stopCamera();
@@ -122,6 +128,14 @@ bool CMainWindow::eventFilter(QObject* /*object*/, QEvent* event)
 		}
 		else
 			painter.fillRect(widget->geometry(), Qt::darkGray);
+
+		painter.setRenderHint(QPainter::TextAntialiasing, false);
+		painter.setPen(QColor(0, 255, 255));
+		QFont font = painter.font();
+		font.setBold(true);
+		font.setPointSize(14);
+		painter.setFont(font);
+		painter.drawText(widget->mapTo(this, QPoint(10, 20)), QString::number(_currentFrameContentsMetric));
 		painter.end();
 
 		return true;
@@ -185,6 +199,7 @@ void CMainWindow::stopCamera()
 		_camera->stop();
 		_camera->unload();
 		_frame = QImage();
+		_currentFrameContentsMetric = -1;
 		ui->_displayWidget->update();
 	}
 
