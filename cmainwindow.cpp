@@ -184,7 +184,20 @@ void CMainWindow::startCamera()
 	if (_camera)
 	{
 		qDebug() << "Connecting to the camera";
+
 		_camera->load();
+		qDebug() << "Supported resolutions:";
+		QSize minSize {0, 0};
+		for (const QSize& size: _camera->supportedViewfinderResolutions())
+		{
+			qDebug() << size;
+			if (size.width() * size.height() < minSize.width() * minSize.height())
+				minSize = size;
+		}
+
+		QCameraViewfinderSettings viewFinderSettings =_camera->viewfinderSettings();
+		viewFinderSettings.setResolution(minSize);
+		_camera->setViewfinderSettings(viewFinderSettings);
 		_camera->start();
 	}
 
