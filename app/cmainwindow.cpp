@@ -14,13 +14,19 @@ DISABLE_COMPILER_WARNINGS
 #include <QTimer>
 RESTORE_COMPILER_WARNINGS
 
+#define PROBING_ENABLED_SETTING QStringLiteral("UI/ProbingEnabled")
+
 CMainWindow::CMainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::CMainWindow)
 {
 	ui->setupUi(this);
-
 	ui->_displayWidget->installEventFilter(this);
+
+	ui->actionProbing_enabled->setChecked(CSettings().value(PROBING_ENABLED_SETTING, true).toBool());
+	connect(ui->actionProbing_enabled, &QAction::triggered, [](bool checked){
+		CSettings().setValue(PROBING_ENABLED_SETTING, checked);
+	});
 
 	connect(&_frameGrabber, &ProxyVideoSurface::frameReceived, this, &CMainWindow::processFrame);
 

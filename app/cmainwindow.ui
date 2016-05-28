@@ -102,6 +102,9 @@
    </property>
   </action>
   <action name="actionProbing_enabled">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>&amp;Probing enabled</string>
    </property>
