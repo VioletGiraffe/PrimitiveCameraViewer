@@ -18,6 +18,7 @@ CCamerasList::CCamerasList(QWidget *parent, const QList<QCameraInfo>& cameras, c
 		{
 			QFont f = item->font();
 			f.setBold(true);
+			f.setPointSize(f.pointSize() + 2);
 			item->setFont(f);
 		}
 
