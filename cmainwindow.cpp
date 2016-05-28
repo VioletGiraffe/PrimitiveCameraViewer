@@ -39,14 +39,11 @@ CMainWindow::CMainWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	connect(ui->_threshold, &QSlider::valueChanged, ui->_lblThresholdValue, (void (QLabel::*)(int))&QLabel::setNum);
-	ui->_lblThresholdValue->setNum(ui->_threshold->value());
-
 	ui->_displayWidget->installEventFilter(this);
 
 	connect(&_frameGrabber, &ProxyVideoSurface::frameReceived, [this](QImage frame) {
 
-		if (!frame.isNull() && ui->_btnEnableProbing->isChecked())
+		if (!frame.isNull() && ui->actionProbing_enabled->isChecked())
 		{
 			// This is the first frame upon connecting to the camera
 			if (_frame.isNull())
@@ -94,8 +91,8 @@ CMainWindow::CMainWindow(QWidget *parent) :
 		ui->_displayWidget->update();
 	});
 
-	connect(ui->_btnConnect, &QPushButton::clicked, [this](bool connect){
-		ui->_btnConnect->setChecked(!connect);
+	connect(ui->actionConnect, &QAction::triggered, [this](bool connect){
+		ui->actionConnect->setChecked(!connect);
 		if (connect)
 			startCamera();
 		else
@@ -166,12 +163,12 @@ void CMainWindow::startCamera()
 			connect(_camera.get(), &QCamera::stateChanged, [this](const QCamera::State state){
 				if (state == QCamera::ActiveState)
 				{
-					ui->_btnConnect->setChecked(true);
+					ui->actionConnect->setChecked(true);
 					setWindowTitle("Connected");
 				}
 				else
 				{
-					ui->_btnConnect->setChecked(false);
+					ui->actionConnect->setChecked(false);
 					setWindowTitle("Not Connected");
 				}
 			});
