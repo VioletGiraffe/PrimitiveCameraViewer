@@ -14,32 +14,6 @@ DISABLE_COMPILER_WARNINGS
 #include <QTimer>
 RESTORE_COMPILER_WARNINGS
 
-inline int analyzeFrame(const QImage& frame)
-{
-	if (frame.depth() != 32)
-		return true;
-
-	const int w = frame.width(), h = frame.height();
-	const int sampleSquareSize = 20;
-	const int sampleStrideW = w / sampleSquareSize, sampleStrideH = h / sampleSquareSize;
-	uint64_t pixelsValueSum = 0;
-	for (int y = 0; y < h; y += sampleStrideH)
-	{
-		const uint32_t* scanLine = (const uint32_t*) frame.scanLine(y);
-		for (int x = 0; x < w; x += sampleStrideW)
-		{
-			// TODO: support non-32 bpp images
-			// TODO: vectorization
-			const uint32_t pixel = scanLine[y];
-			pixelsValueSum += ((pixel & 0x00FF0000) >> 16) + ((pixel & 0x0000FF00) >> 8) + (pixel & 0x000000FF);
-		}
-	}
-
-	const int result = (int)(pixelsValueSum / ((uint64_t) w / sampleStrideW * (uint64_t) h / sampleStrideH * 3ull));
-	qDebug() << "Frame metric:" << result;
-	return result;
-}
-
 CMainWindow::CMainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::CMainWindow)
@@ -48,56 +22,7 @@ CMainWindow::CMainWindow(QWidget *parent) :
 
 	ui->_displayWidget->installEventFilter(this);
 
-	connect(&_frameGrabber, &ProxyVideoSurface::frameReceived, [this](QImage frame) {
-
-		if (!frame.isNull() && ui->actionProbing_enabled->isChecked())
-		{
-			const int threshold = CSettings().value(IMAGE_PIXEL_VALUE_THRESHOLD_SETTING, IMAGE_PIXEL_VALUE_THRESHOLD_DEFAULT).toInt();
-			// This is the first frame upon connecting to the camera
-			if (_frame.isNull())
-			{
-				_currentFrameContentsMetric = analyzeFrame(frame);
-				const auto frameScanResult = _frameScanFilter.processSample(_currentFrameContentsMetric >= threshold);
-				if (frameScanResult == Filter::Invalid)
-				{
-					// Disconnect and schedule re-check
-					stopCamera();
-					QTimer::singleShot(5000, [this](){
-						startCamera();
-					});
-
-					return;
-				}
-				else if (frameScanResult == Filter::Undefined)
-					return; // To avoid assigning _frame, which would prevent the following frames from being scanned
-			}
-			else // Not the first frame - apparently, we're streaming a live picture
-				 // Avoid checking every single frame
-			{
-				static uint32_t frameCounter = 0;
-				++frameCounter;
-
-				if (frameCounter > 30)
-				{
-					frameCounter = 0;
-					_currentFrameContentsMetric = analyzeFrame(frame);
-					if (_currentFrameContentsMetric < threshold)
-					{
-						// Disconnect and schedule re-check
-						stopCamera();
-						QTimer::singleShot(5000, [this](){
-							startCamera();
-						});
-
-						return;
-					}
-				}
-			}
-		}
-
-		_frame = frame;
-		ui->_displayWidget->update();
-	});
+	connect(&_frameGrabber, &ProxyVideoSurface::frameReceived, this, &CMainWindow::processFrame);
 
 	connect(ui->actionConnect, &QAction::triggered, [this](bool connect){
 		ui->actionConnect->setChecked(!connect);
@@ -229,4 +154,88 @@ void CMainWindow::stopCamera()
 	}
 
 	setWindowTitle("Not Connected");
+}
+
+inline int analyzeFrame(const QImage& frame)
+{
+	if (frame.depth() != 32)
+		return true;
+
+	const int w = frame.width(), h = frame.height();
+	const int sampleSquareSize = 20;
+	const int sampleStrideW = w / sampleSquareSize, sampleStrideH = h / sampleSquareSize;
+	uint64_t pixelsValueSum = 0;
+	for (int y = 0; y < h; y += sampleStrideH)
+	{
+		const uint32_t* scanLine = (const uint32_t*) frame.scanLine(y);
+		for (int x = 0; x < w; x += sampleStrideW)
+		{
+			// TODO: support non-32 bpp images
+			// TODO: vectorization
+			const uint32_t pixel = scanLine[y];
+			pixelsValueSum += ((pixel & 0x00FF0000) >> 16) + ((pixel & 0x0000FF00) >> 8) + (pixel & 0x000000FF);
+		}
+	}
+
+	const int result = (int) (pixelsValueSum / ((uint64_t) w / sampleStrideW * (uint64_t) h / sampleStrideH * 3ull));
+	return result;
+}
+
+void CMainWindow::processFrame(QImage frame)
+{
+	if (!frame.isNull() && ui->actionProbing_enabled->isChecked())
+	{
+		const int threshold = CSettings().value(IMAGE_PIXEL_VALUE_THRESHOLD_SETTING, IMAGE_PIXEL_VALUE_THRESHOLD_DEFAULT).toInt();
+		// This is the first frame upon connecting to the camera
+		if (_frame.isNull())
+		{
+			_currentFrameContentsMetric = analyzeFrame(frame);
+			const auto frameScanResult = _frameScanFilter.processSample(_currentFrameContentsMetric >= threshold);
+			if (frameScanResult == Filter::Invalid)
+			{
+				// Disconnect and schedule re-check
+				stopCamera();
+				QTimer::singleShot(5000, [this](){
+					startCamera();
+				});
+
+				return;
+			}
+			else if (frameScanResult == Filter::Undefined)
+				return; // To avoid assigning _frame, which would prevent the following frames from being scanned
+			else
+			{
+				// We've detected valid image!
+				showFullScreen();
+				raise();
+			}
+		}
+		else // Not the first frame - apparently, we're streaming a live picture
+			// Avoid checking every single frame
+		{
+			static uint32_t frameCounter = 0;
+			++frameCounter;
+
+			if (frameCounter > 30)
+			{
+				frameCounter = 0;
+				_currentFrameContentsMetric = analyzeFrame(frame);
+				if (_currentFrameContentsMetric < threshold)
+				{
+					// Disconnect and schedule re-check
+					stopCamera();
+					QTimer::singleShot(5000, [this](){
+						startCamera();
+					});
+
+					showNormal();
+					showMinimized();
+					return;
+				}
+			}
+		}
+	}
+
+	_frame = frame;
+	ui->_displayWidget->update();
 }

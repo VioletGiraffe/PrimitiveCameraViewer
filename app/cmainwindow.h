@@ -72,6 +72,8 @@ private:
 	void startCamera();
 	void stopCamera();
 
+	void processFrame(QImage frame);
+
 private:
 	Ui::CMainWindow *ui;
 
