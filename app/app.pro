@@ -52,13 +52,17 @@ mac*|linux*{
 	PRE_TARGETDEPS += $${DESTDIR}/libcore.a $${DESTDIR}/libautoupdater.a
 }
 
+win*{
+	RC_FILE = resources/simplecamviewer.rc
+}
+
 INCLUDEPATH += \
 	../cpputils/ \
 	../qtutils/
 
 
 SOURCES += main.cpp\
-	cmainwindow.cpp \
+    cmainwindow.cpp \
     cproxyvideosurface.cpp \
     settings/csettingspagecamera.cpp \
     ccameraslist.cpp
