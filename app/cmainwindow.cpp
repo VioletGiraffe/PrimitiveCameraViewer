@@ -1,11 +1,18 @@
 #include "cmainwindow.h"
 #include "ui_cmainwindow.h"
 
+#include "settings/settings.h"
+#include "settings/csettings.h"
+#include "settingsui/csettingsdialog.h"
+#include "settings/csettingspagecamera.h"
+
+DISABLE_COMPILER_WARNINGS
 #include <QCameraInfo>
+#include <QDebug>
 #include <QImageReader>
 #include <QPainter>
-#include <QTime>
 #include <QTimer>
+RESTORE_COMPILER_WARNINGS
 
 inline int analyzeFrame(const QImage& frame)
 {
@@ -45,11 +52,12 @@ CMainWindow::CMainWindow(QWidget *parent) :
 
 		if (!frame.isNull() && ui->actionProbing_enabled->isChecked())
 		{
+			const int threshold = CSettings().value(IMAGE_PIXEL_VALUE_THRESHOLD_SETTING, IMAGE_PIXEL_VALUE_THRESHOLD_DEFAULT).toInt();
 			// This is the first frame upon connecting to the camera
 			if (_frame.isNull())
 			{
 				_currentFrameContentsMetric = analyzeFrame(frame);
-				const auto frameScanResult = _frameScanFilter.processSample(_currentFrameContentsMetric >= ui->_threshold->value());
+				const auto frameScanResult = _frameScanFilter.processSample(_currentFrameContentsMetric >= threshold);
 				if (frameScanResult == Filter::Invalid)
 				{
 					// Disconnect and schedule re-check
@@ -73,7 +81,7 @@ CMainWindow::CMainWindow(QWidget *parent) :
 				{
 					frameCounter = 0;
 					_currentFrameContentsMetric = analyzeFrame(frame);
-					if (_currentFrameContentsMetric < ui->_threshold->value())
+					if (_currentFrameContentsMetric < threshold)
 					{
 						// Disconnect and schedule re-check
 						stopCamera();
@@ -99,7 +107,16 @@ CMainWindow::CMainWindow(QWidget *parent) :
 			stopCamera();
 	});
 
-	startCamera();
+	connect(ui->actionSettings, &QAction::triggered, [this](){
+		CSettingsDialog(this)
+			.addSettingsPage(new CSettingsPageCamera())
+			.exec();
+	});
+
+	// Some streaming devices seem to malfunction if they are connected to too soon after Windows startup. This is a safeguard against that.
+	QTimer::singleShot(7000, [this](){
+		startCamera();
+	});
 }
 
 CMainWindow::~CMainWindow()
