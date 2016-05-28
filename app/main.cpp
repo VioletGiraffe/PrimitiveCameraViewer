@@ -23,7 +23,7 @@ int main(int argc, char *argv [])
 	CSettings::setOrganizationName(app.organizationName());
 
 	CMainWindow w;
-	w.show();
+	w.showMinimized();
 
 	return app.exec();
 }
