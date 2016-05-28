@@ -131,6 +131,8 @@ bool CMainWindow::eventFilter(QObject* /*object*/, QEvent* event)
 	{
 		QWidget * widget = ui->_displayWidget;
 		QPainter painter(widget);
+		// Fill the background according the the color assigned to this widget
+		painter.fillRect(widget->rect(), painter.background());
 		if (!_frame.isNull())
 		{
 			const QSize scaledImagesize = _frame.size().scaled(widget->size(), Qt::KeepAspectRatio);
@@ -139,18 +141,15 @@ bool CMainWindow::eventFilter(QObject* /*object*/, QEvent* event)
 			imageDrawRect.translate((widget->width() - scaledImagesize.width()) / 2, (widget->height() - scaledImagesize.height()) / 2);
 			painter.drawImage(imageDrawRect, _frame);
 		}
-		else
-			painter.fillRect(widget->geometry(), Qt::darkGray);
 
-		painter.setRenderHint(QPainter::TextAntialiasing, false);
-		painter.setPen(QColor(0, 255, 255));
-		QFont font = painter.font();
-		font.setBold(true);
-		font.setPointSize(14);
-		painter.setFont(font);
-		painter.drawText(widget->mapTo(this, QPoint(10, 20)), QString::number(_currentFrameContentsMetric));
+		if (_currentFrameContentsMetric != -1)
+		{
+			painter.setRenderHint(QPainter::TextAntialiasing, false);
+			painter.setPen(QColor(0, 255, 255));
+			painter.drawText(5, painter.fontMetrics().height()+5, QString::number(_currentFrameContentsMetric));
+		}
+
 		painter.end();
-
 		return true;
 	}
 
