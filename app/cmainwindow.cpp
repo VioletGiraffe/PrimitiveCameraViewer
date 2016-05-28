@@ -76,7 +76,7 @@ bool CMainWindow::eventFilter(QObject* /*object*/, QEvent* event)
 		if (_currentFrameContentsMetric != -1)
 		{
 			painter.setRenderHint(QPainter::TextAntialiasing, false);
-			painter.setPen(QColor(0, 255, 255));
+			painter.setPen(QColor(255, 0, 255));
 			painter.drawText(5, painter.fontMetrics().height()+5, QString::number(_currentFrameContentsMetric));
 		}
 
@@ -108,16 +108,7 @@ void CMainWindow::startCamera()
 			_camera->setViewfinder(&_frameGrabber);
 
 			connect(_camera.get(), &QCamera::stateChanged, [this](const QCamera::State state){
-				if (state == QCamera::ActiveState)
-				{
-					ui->actionConnect->setChecked(true);
-					setWindowTitle("Connected");
-				}
-				else
-				{
-					ui->actionConnect->setChecked(false);
-					setWindowTitle("Not Connected");
-				}
+					ui->actionConnect->setChecked(state == QCamera::ActiveState);
 			});
 
 			break;
@@ -159,7 +150,7 @@ void CMainWindow::stopCamera()
 		ui->_displayWidget->update();
 	}
 
-	setWindowTitle("Not Connected");
+	showNormal();
 }
 
 inline int analyzeFrame(const QImage& frame)
@@ -212,6 +203,7 @@ void CMainWindow::processFrame(QImage frame)
 			else
 			{
 				// We've detected valid image!
+				showNormal(); // showFullScreen doesn't work properly if the window was minimized
 				showFullScreen();
 				raise();
 			}
@@ -234,7 +226,6 @@ void CMainWindow::processFrame(QImage frame)
 						startCamera();
 					});
 
-					showNormal();
 					showMinimized();
 					return;
 				}
