@@ -58,7 +58,7 @@ CMainWindow::CMainWindow(QWidget *parent) :
 				{
 					// Disconnect and schedule re-check
 					stopCamera();
-					QTimer::singleShot(10000, [this](){
+					QTimer::singleShot(5000, [this](){
 						startCamera();
 					});
 
@@ -79,9 +79,9 @@ CMainWindow::CMainWindow(QWidget *parent) :
 					_currentFrameContentsMetric = analyzeFrame(frame);
 					if (_currentFrameContentsMetric < ui->_threshold->value())
 					{
-						// Diisconnect and schedule re-check
+						// Disconnect and schedule re-check
 						stopCamera();
-						QTimer::singleShot(10000, [this](){
+						QTimer::singleShot(5000, [this](){
 							startCamera();
 						});
 
