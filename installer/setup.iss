@@ -10,6 +10,7 @@ OutputBaseFilename=PrimitiveCameraViewer
 UsePreviousAppDir=yes
 
 UninstallDisplayIcon={app}\PrimitiveCameraViewer.exe
+SetupIconFile=../app/resources/icon.ico
 
 WizardImageBackColor=clWhite
 ShowTasksTreeLines=yes
