@@ -60,12 +60,15 @@ INCLUDEPATH += \
 SOURCES += main.cpp\
 	cmainwindow.cpp \
     cproxyvideosurface.cpp \
-    settings/csettingspagecamera.cpp
+    settings/csettingspagecamera.cpp \
+    ccameraslist.cpp
 
 HEADERS  += cmainwindow.h \
     cproxyvideosurface.h \
     settings/csettingspagecamera.h \
-    settings/settings.h
+    settings/settings.h \
+    ccameraslist.h
 
 FORMS    += cmainwindow.ui \
-    settings/csettingspagecamera.ui
+    settings/csettingspagecamera.ui \
+    ccameraslist.ui

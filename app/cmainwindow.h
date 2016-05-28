@@ -68,6 +68,9 @@ public:
 protected:
 	bool eventFilter(QObject *, QEvent *) override;
 
+private: // UI setup
+	void initActions();
+
 private:
 	void startCamera();
 	void stopCamera();

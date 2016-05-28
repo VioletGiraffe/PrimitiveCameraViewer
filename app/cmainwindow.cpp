@@ -1,5 +1,5 @@
 #include "cmainwindow.h"
-#include "ui_cmainwindow.h"
+#include "ccameraslist.h"
 
 #include "settings/settings.h"
 #include "settings/csettings.h"
@@ -7,6 +7,8 @@
 #include "settings/csettingspagecamera.h"
 
 DISABLE_COMPILER_WARNINGS
+#include "ui_cmainwindow.h"
+
 #include <QCameraInfo>
 #include <QDebug>
 #include <QImageReader>
@@ -23,26 +25,9 @@ CMainWindow::CMainWindow(QWidget *parent) :
 	ui->setupUi(this);
 	ui->_displayWidget->installEventFilter(this);
 
-	ui->actionProbing_enabled->setChecked(CSettings().value(PROBING_ENABLED_SETTING, true).toBool());
-	connect(ui->actionProbing_enabled, &QAction::triggered, [](bool checked){
-		CSettings().setValue(PROBING_ENABLED_SETTING, checked);
-	});
-
 	connect(&_frameGrabber, &ProxyVideoSurface::frameReceived, this, &CMainWindow::processFrame);
 
-	connect(ui->actionConnect, &QAction::triggered, [this](bool connect){
-		ui->actionConnect->setChecked(!connect);
-		if (connect)
-			startCamera();
-		else
-			stopCamera();
-	});
-
-	connect(ui->actionSettings, &QAction::triggered, [this](){
-		CSettingsDialog(this)
-			.addSettingsPage(new CSettingsPageCamera())
-			.exec();
-	});
+	initActions();
 
 	if (ui->actionProbing_enabled->isChecked())
 	{
@@ -93,14 +78,41 @@ bool CMainWindow::eventFilter(QObject* /*object*/, QEvent* event)
 	return false;
 }
 
+void CMainWindow::initActions()
+{
+	ui->actionProbing_enabled->setChecked(CSettings().value(PROBING_ENABLED_SETTING, true).toBool());
+	connect(ui->actionProbing_enabled, &QAction::triggered, [](bool checked){
+		CSettings().setValue(PROBING_ENABLED_SETTING, checked);
+	});
+
+	connect(ui->actionConnect, &QAction::triggered, [this](bool connect){
+		ui->actionConnect->setChecked(!connect);
+		if (connect)
+			startCamera();
+		else
+			stopCamera();
+	});
+
+	connect(ui->actionSettings, &QAction::triggered, [this](){
+		CSettingsDialog(this)
+			.addSettingsPage(new CSettingsPageCamera())
+			.exec();
+	});
+
+	connect(ui->action_View_available_cameras, &QAction::triggered, [this](){
+		CCamerasList(this, QCameraInfo::availableCameras(), QString()).exec();
+	});
+}
+
 void CMainWindow::startCamera()
 {
 	if (!_camera)
 	{
+		const QString cameraNameFilter = CSettings().value(CAMERA_NAME_FILTER_SETTING).toString();
 		const auto cameras = QCameraInfo::availableCameras();
 		for (const QCameraInfo& cameraInfo : cameras)
 		{
-			if (cameraInfo.isNull())
+			if (cameraInfo.isNull() || (!cameraNameFilter.isEmpty() && !cameraInfo.deviceName().contains(cameraNameFilter)))
 				continue;
 
 			qDebug() << "Creating the camera" << cameraInfo.description();

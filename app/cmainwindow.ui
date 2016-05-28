@@ -60,6 +60,8 @@
     </property>
     <addaction name="actionConnect"/>
     <addaction name="actionProbing_enabled"/>
+    <addaction name="separator"/>
+    <addaction name="action_View_available_cameras"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -107,6 +109,11 @@
    </property>
    <property name="text">
     <string>&amp;Probing enabled</string>
+   </property>
+  </action>
+  <action name="action_View_available_cameras">
+   <property name="text">
+    <string>&amp;View available cameras...</string>
    </property>
   </action>
  </widget>
