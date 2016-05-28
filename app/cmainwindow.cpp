@@ -44,10 +44,13 @@ CMainWindow::CMainWindow(QWidget *parent) :
 			.exec();
 	});
 
-	// Some streaming devices seem to malfunction if they are connected to too soon after Windows startup. This is a safeguard against that.
-	QTimer::singleShot(7000, [this](){
-		startCamera();
-	});
+	if (ui->actionProbing_enabled->isChecked())
+	{
+		// Some streaming devices seem to malfunction if they are connected to too soon after Windows startup. This is a safeguard against that.
+		QTimer::singleShot(7000, [this](){
+			startCamera();
+		});
+	}
 }
 
 CMainWindow::~CMainWindow()
@@ -70,7 +73,10 @@ bool CMainWindow::eventFilter(QObject* /*object*/, QEvent* event)
 			QRect imageDrawRect = widget->geometry();
 			imageDrawRect.setSize(scaledImagesize);
 			imageDrawRect.translate((widget->width() - scaledImagesize.width()) / 2, (widget->height() - scaledImagesize.height()) / 2);
-			painter.drawImage(imageDrawRect, _frame);
+
+			CSettings s;
+			const bool mirrorH = s.value(IMAGE_HORIZONTAL_MIRROR_SETTING, false).toBool(), mirrorV = s.value(IMAGE_VERTICAL_MIRROR_SETTING, false).toBool();
+			painter.drawImage(imageDrawRect, mirrorH || mirrorV ? _frame.mirrored(mirrorH, mirrorV) : _frame);
 		}
 
 		if (_currentFrameContentsMetric != -1)
