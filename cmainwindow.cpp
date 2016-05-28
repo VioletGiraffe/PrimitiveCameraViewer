@@ -28,7 +28,6 @@ inline int analyzeFrame(const QImage& frame)
 		}
 	}
 
-	
 	const int result = (int)(pixelsValueSum / ((uint64_t) w / sampleStrideW * (uint64_t) h / sampleStrideH * 3ull));
 	qDebug() << "Frame metric:" << result;
 	return result;
@@ -187,7 +186,7 @@ void CMainWindow::startCamera()
 
 		_camera->load();
 		qDebug() << "Supported resolutions:";
-		QSize minSize {0, 0};
+		QSize minSize {31000, 31000};
 		for (const QSize& size: _camera->supportedViewfinderResolutions())
 		{
 			qDebug() << size;
