@@ -6,14 +6,9 @@
 *.user
 *.userosscache
 *.sln.docstates
-*.vcxproj
 *.sln
-*.filters
-ui_*.h
-installer/binaries
-installer/*.exe
-installer/set_qt_paths.bat
-
+*.vcxproj*
+*.VC.db
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -28,6 +23,8 @@ x86/
 bld/
 [Bb]in/
 [Oo]bj/
+installer/binaries/
+installer/*.exe
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -242,3 +239,4 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+/installer/set_qt_paths.bat

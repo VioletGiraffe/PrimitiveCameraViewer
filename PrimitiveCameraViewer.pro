@@ -1,22 +1,11 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2016-05-01T19:43:44
-#
-#-------------------------------------------------
+TEMPLATE = subdirs
 
-QT       = core gui multimedia
+SUBDIRS = app cpputils qtutils
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+cpputils.subdir = cpputils
 
-TARGET = PrimitiveCameraViewer
-TEMPLATE = app
+qtutils.subdir = qtutils
+qtutils.depends = cpputils
 
-QMAKE_CXXFLAGS += /MP
-
-
-SOURCES += main.cpp\
-        cmainwindow.cpp
-
-HEADERS  += cmainwindow.h
-
-FORMS    += cmainwindow.ui
+app.subdir  = app
+app.depends = qtutils
