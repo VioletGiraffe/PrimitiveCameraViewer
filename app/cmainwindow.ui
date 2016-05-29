@@ -69,9 +69,18 @@
     </property>
     <addaction name="actionSettings"/>
    </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="action_Check_for_updates"/>
+    <addaction name="separator"/>
+    <addaction name="action_About"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuCamera"/>
    <addaction name="menuSettings"/>
+   <addaction name="menu_Help"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
@@ -114,6 +123,16 @@
   <action name="action_View_available_cameras">
    <property name="text">
     <string>&amp;View available cameras...</string>
+   </property>
+  </action>
+  <action name="action_Check_for_updates">
+   <property name="text">
+    <string>&amp;Check for updates...</string>
+   </property>
+  </action>
+  <action name="action_About">
+   <property name="text">
+    <string>&amp;About...</string>
    </property>
   </action>
  </widget>

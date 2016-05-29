@@ -25,7 +25,7 @@ MOC_DIR     = ../build/$${OUTPUT_DIR}/app
 UI_DIR      = ../build/$${OUTPUT_DIR}/app
 RCC_DIR     = ../build/$${OUTPUT_DIR}/app
 
-LIBS += -L../bin/$${OUTPUT_DIR} -lqtutils -lcpputils
+LIBS += -L../bin/$${OUTPUT_DIR} -lqtutils -lcpputils -lautoupdater
 
 win*{
 	QMAKE_CXXFLAGS += /MP /wd4251
@@ -58,21 +58,26 @@ win*{
 
 INCLUDEPATH += \
 	../cpputils/ \
-	../qtutils/
+	../qtutils/ \
+	../github-releases-autoupdater/src/
 
 
 SOURCES += main.cpp\
     cmainwindow.cpp \
     cproxyvideosurface.cpp \
     settings/csettingspagecamera.cpp \
-    ccameraslist.cpp
+    ccameraslist.cpp \
+    caboutdialog.cpp
 
 HEADERS  += cmainwindow.h \
     cproxyvideosurface.h \
     settings/csettingspagecamera.h \
     settings/settings.h \
-    ccameraslist.h
+    ccameraslist.h \
+    version.h \
+    caboutdialog.h
 
 FORMS    += cmainwindow.ui \
     settings/csettingspagecamera.ui \
-    ccameraslist.ui
+    ccameraslist.ui \
+    caboutdialog.ui

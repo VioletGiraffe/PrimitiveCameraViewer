@@ -1,11 +1,14 @@
 TEMPLATE = subdirs
 
-SUBDIRS = app cpputils qtutils
+SUBDIRS = app cpputils qtutils github-releases-autoupdater
 
 cpputils.subdir = cpputils
 
 qtutils.subdir = qtutils
 qtutils.depends = cpputils
 
+github-releases-autoupdater.subdir = github-releases-autoupdater
+github-releases-autoupdater.depends = cpputils
+
 app.subdir  = app
-app.depends = qtutils
+app.depends = qtutils github-releases-autoupdater
