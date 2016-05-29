@@ -16,6 +16,7 @@ call "%VS_TOOLS_DIR%VsDevCmd.bat" x86
 msbuild ..\PrimitiveCameraViewer.sln /t:Build /p:Configuration=Release;PlatformToolset=v120_xp
 
 xcopy /R /Y ..\bin\release\PrimitiveCameraViewer.exe binaries\
+xcopy /R /Y "3rdparty binaries"\32\* binaries\
 
 SETLOCAL
 SET PATH=%QTDIR32%\bin\
