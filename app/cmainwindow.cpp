@@ -21,6 +21,7 @@ RESTORE_COMPILER_WARNINGS
 
 #define PROBING_ENABLED_SETTING QStringLiteral("UI/ProbingEnabled")
 #define LAST_UPDATE_CHECK_TIMESTAMP QStringLiteral("UI/LastUpdateCheckTimestamp")
+#define SHOW_TOOLBAR_SETTING QStringLiteral("UI/ShowToolbar")
 
 CMainWindow::CMainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -49,6 +50,8 @@ CMainWindow::CMainWindow(QWidget *parent) :
 		connect(dlg, &QDialog::rejected, dlg, &QDialog::deleteLater);
 		connect(dlg, &QDialog::accepted, dlg, &QDialog::deleteLater);
 	}
+
+	ui->toolBar->setVisible(CSettings().value(SHOW_TOOLBAR_SETTING, false).toBool());
 }
 
 CMainWindow::~CMainWindow()
@@ -89,6 +92,12 @@ bool CMainWindow::eventFilter(QObject* /*object*/, QEvent* event)
 	}
 
 	return false;
+}
+
+void CMainWindow::closeEvent(QCloseEvent* e)
+{
+	CSettings().setValue(SHOW_TOOLBAR_SETTING, ui->toolBar->isVisible());
+	QMainWindow::closeEvent(e);
 }
 
 void CMainWindow::initActions()

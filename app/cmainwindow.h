@@ -67,6 +67,7 @@ public:
 
 protected:
 	bool eventFilter(QObject *, QEvent *) override;
+	void closeEvent(QCloseEvent* e);
 
 private: // UI setup
 	void initActions();
