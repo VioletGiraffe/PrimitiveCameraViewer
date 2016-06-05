@@ -231,7 +231,8 @@ void CMainWindow::processFrame(QImage frame)
 {
 	if (!frame.isNull() && ui->actionProbing_enabled->isChecked())
 	{
-		const int threshold = CSettings().value(IMAGE_PIXEL_VALUE_THRESHOLD_SETTING, IMAGE_PIXEL_VALUE_THRESHOLD_DEFAULT).toInt();
+		CSettings s;
+		const int threshold = s.value(IMAGE_PIXEL_VALUE_THRESHOLD_SETTING, IMAGE_PIXEL_VALUE_THRESHOLD_DEFAULT).toInt();
 		// This is the first frame upon connecting to the camera
 		if (_frame.isNull())
 		{
@@ -241,7 +242,7 @@ void CMainWindow::processFrame(QImage frame)
 			{
 				// Disconnect and schedule re-check
 				stopCamera();
-				QTimer::singleShot(5000, [this](){
+				QTimer::singleShot(s.value(CAMERA_PROBING_INTERVAL_SETTING, CAMERA_PROBING_INTERVAL_DEFAULT).toInt(), [this](){
 					startCamera();
 				});
 
@@ -271,7 +272,7 @@ void CMainWindow::processFrame(QImage frame)
 				{
 					// Disconnect and schedule re-check
 					stopCamera();
-					QTimer::singleShot(5000, [this](){
+					QTimer::singleShot(s.value(CAMERA_PROBING_INTERVAL_SETTING, CAMERA_PROBING_INTERVAL_DEFAULT).toInt(), [this](){
 						startCamera();
 					});
 

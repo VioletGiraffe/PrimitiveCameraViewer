@@ -13,3 +13,6 @@ RESTORE_COMPILER_WARNINGS
 
 #define IMAGE_VERTICAL_MIRROR_SETTING QStringLiteral("Camera/MirrorVertically")
 #define IMAGE_HORIZONTAL_MIRROR_SETTING QStringLiteral("Camera/MirrorHorizontally")
+
+#define CAMERA_PROBING_INTERVAL_SETTING QStringLiteral("Camera/ProbingInterval")
+#define CAMERA_PROBING_INTERVAL_DEFAULT 3
