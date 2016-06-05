@@ -275,6 +275,7 @@ void CMainWindow::processFrame(QImage frame)
 						startCamera();
 					});
 
+					showNormal();
 					showMinimized();
 					return;
 				}
