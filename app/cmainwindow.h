@@ -18,7 +18,7 @@ class Filter
 public:
 	enum State{Undefined, Invalid, Valid};
 
-	inline Filter() : _samples(6) {
+	inline explicit Filter(size_t numSamples = 5) : _samples(numSamples) {
 		reset();
 	}
 
@@ -84,7 +84,7 @@ private:
 	ProxyVideoSurface _frameGrabber;
 	std::shared_ptr<QCamera> _camera;
 	QImage _frame;
-	Filter _frameScanFilter;
+	Filter _frameScanFilter {5};
 	int _currentFrameContentsMetric = -1;
 };
 

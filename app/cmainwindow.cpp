@@ -198,8 +198,6 @@ void CMainWindow::stopCamera()
 		_currentFrameContentsMetric = -1;
 		ui->_displayWidget->update();
 	}
-
-	showNormal();
 }
 
 inline int analyzeFrame(const QImage& frame)
@@ -242,7 +240,7 @@ void CMainWindow::processFrame(QImage frame)
 			{
 				// Disconnect and schedule re-check
 				stopCamera();
-				QTimer::singleShot(s.value(CAMERA_PROBING_INTERVAL_SETTING, CAMERA_PROBING_INTERVAL_DEFAULT).toInt(), [this](){
+				QTimer::singleShot(s.value(CAMERA_PROBING_INTERVAL_SETTING, CAMERA_PROBING_INTERVAL_DEFAULT).toInt() * 1000, [this](){
 					startCamera();
 				});
 
@@ -272,7 +270,7 @@ void CMainWindow::processFrame(QImage frame)
 				{
 					// Disconnect and schedule re-check
 					stopCamera();
-					QTimer::singleShot(s.value(CAMERA_PROBING_INTERVAL_SETTING, CAMERA_PROBING_INTERVAL_DEFAULT).toInt(), [this](){
+					QTimer::singleShot(s.value(CAMERA_PROBING_INTERVAL_SETTING, CAMERA_PROBING_INTERVAL_DEFAULT).toInt() * 1000, [this](){
 						startCamera();
 					});
 
