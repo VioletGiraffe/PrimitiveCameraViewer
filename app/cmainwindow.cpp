@@ -1,6 +1,6 @@
 #include "cmainwindow.h"
 #include "ccameraslist.h"
-#include "caboutdialog.h"
+#include "aboutdialog/caboutdialog.h"
 #include "updaterUI/cupdaterdialog.h"
 #include "version.h"
 
@@ -131,7 +131,7 @@ void CMainWindow::initActions()
 	});
 
 	connect(ui->action_About, &QAction::triggered, [this](){
-		CAboutDialog(this).exec();
+		CAboutDialog(VERSION_STRING, this).exec();
 	});
 }
 

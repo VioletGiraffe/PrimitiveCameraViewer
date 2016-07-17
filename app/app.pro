@@ -66,18 +66,15 @@ SOURCES += main.cpp\
     cmainwindow.cpp \
     cproxyvideosurface.cpp \
     settings/csettingspagecamera.cpp \
-    ccameraslist.cpp \
-    caboutdialog.cpp
+    ccameraslist.cpp
 
 HEADERS  += cmainwindow.h \
     cproxyvideosurface.h \
     settings/csettingspagecamera.h \
     settings/settings.h \
     ccameraslist.h \
-    version.h \
-    caboutdialog.h
+    version.h
 
 FORMS    += cmainwindow.ui \
     settings/csettingspagecamera.ui \
-    ccameraslist.ui \
-    caboutdialog.ui
+    ccameraslist.ui
