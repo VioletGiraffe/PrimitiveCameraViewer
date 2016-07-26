@@ -1,5 +1,7 @@
 # Primitive Camera Viewer
 
+[![Build status](https://ci.appveyor.com/api/projects/status/4u7nh6ed0vxn34ad?svg=true)](https://ci.appveyor.com/project/VioletGiraffe/primitivecameraviewer)
+
 Connects to a standard Windows camera device (web camera, external USB camera, video capture card etc.) and displays the live image from it. 
 
 Features and functions:
