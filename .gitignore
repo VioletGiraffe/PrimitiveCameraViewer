@@ -9,6 +9,7 @@
 *.sln
 *.vcxproj*
 *.VC.db
+ui_*.h
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
