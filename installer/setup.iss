@@ -12,7 +12,6 @@ UsePreviousAppDir=yes
 UninstallDisplayIcon={app}\PrimitiveCameraViewer.exe
 SetupIconFile=../app/resources/icon.ico
 
-WizardImageBackColor=clWhite
 ShowTasksTreeLines=yes
 
 SolidCompression=true
@@ -33,7 +32,7 @@ Source: binaries/*; DestDir: {app}; Flags: ignoreversion
 Source: binaries/Qt/*; DestDir: {app}; Flags: ignoreversion recursesubdirs
 
 ;MSVC binaries
-Source: binaries/msvcr/*; DestDir: {app}; Flags: ignoreversion
+Source: binaries/64/msvcr/*; DestDir: {app}; Flags: ignoreversion
 
 [Icons]
 Name: {group}\Primitive Camera Viewer; Filename: {app}\PrimitiveCameraViewer.exe;

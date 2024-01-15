@@ -7,8 +7,9 @@ environment:
     
 install:
 - git submodule update --init --recursive 
-- set PATH=C:\Qt\%qt%\bin;%PATH%;
-- qmake.exe -tp vc -r
+- set QTDIR64=C:\Qt\%qt%\bin
+- cd installer
+- create_installer.bat
 build:
   parallel: true
   verbosity: minimal
