@@ -12,4 +12,4 @@ install:
 - create_installer.bat
 build:
   parallel: true
-  verbosity: minimal
+  verbosity: detailed
