@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 
-SUBDIRS = app cpputils qtutils github-releases-autoupdater
+SUBDIRS = app cpputils qtutils github-releases-autoupdater cpp-template-utils
 
 cpputils.subdir = cpputils
 

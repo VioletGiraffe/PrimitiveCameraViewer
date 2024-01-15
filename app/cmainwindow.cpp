@@ -1,7 +1,6 @@
 #include "cmainwindow.h"
 #include "ccameraslist.h"
 #include "aboutdialog/caboutdialog.h"
-#include "updaterUI/cupdaterdialog.h"
 #include "version.h"
 
 #include "settings/settings.h"
@@ -40,15 +39,6 @@ CMainWindow::CMainWindow(QWidget *parent) :
 		QTimer::singleShot(7000, [this](){
 			startCamera();
 		});
-	}
-
-	// Check for updates
-	if (CSettings().value(LAST_UPDATE_CHECK_TIMESTAMP, QDateTime::fromTime_t(1)).toDateTime().msecsTo(QDateTime::currentDateTime()) >= 1000 * 3600 * 24)
-	{
-		CSettings().setValue(LAST_UPDATE_CHECK_TIMESTAMP, QDateTime::currentDateTime());
-		auto dlg = new CUpdaterDialog(this, REPO_ADDRESS, VERSION_STRING, true);
-		connect(dlg, &QDialog::rejected, dlg, &QDialog::deleteLater);
-		connect(dlg, &QDialog::accepted, dlg, &QDialog::deleteLater);
 	}
 
 	ui->toolBar->setVisible(CSettings().value(SHOW_TOOLBAR_SETTING, false).toBool());
@@ -123,11 +113,6 @@ void CMainWindow::initActions()
 
 	connect(ui->action_View_available_cameras, &QAction::triggered, [this](){
 		CCamerasList(this, QCameraInfo::availableCameras(), QString()).exec();
-	});
-
-	connect(ui->action_Check_for_updates, &QAction::triggered, [this](){
-		CSettings().setValue(LAST_UPDATE_CHECK_TIMESTAMP, QDateTime::currentDateTime());
-		CUpdaterDialog(this, REPO_ADDRESS, VERSION_STRING).exec();
 	});
 
 	connect(ui->action_About, &QAction::triggered, [this](){

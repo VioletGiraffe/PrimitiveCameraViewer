@@ -10,6 +10,9 @@
 *.vcxproj*
 *.VC.db
 ui_*.h
+.qtc_clangd/
+.qmake.stash
+Makefile*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

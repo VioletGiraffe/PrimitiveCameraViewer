@@ -59,15 +59,15 @@ namespace Ui {
 class CMainWindow;
 }
 
-class CMainWindow : public QMainWindow
+class CMainWindow final : public QMainWindow
 {
 public:
-	explicit CMainWindow(QWidget *parent = 0);
-	~CMainWindow();
+	explicit CMainWindow(QWidget *parent = nullptr);
+	~CMainWindow() override;
 
 protected:
 	bool eventFilter(QObject *, QEvent *) override;
-	void closeEvent(QCloseEvent* e);
+	void closeEvent(QCloseEvent* e) override;
 
 private: // UI setup
 	void initActions();

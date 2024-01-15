@@ -9,15 +9,15 @@ QT = core gui widgets multimedia
 TARGET = PrimitiveCameraViewer
 TEMPLATE = app
 
-CONFIG += c++14
+CONFIG += strict_c++ c++latest
 
 mac* | linux*{
 	CONFIG(release, debug|release):CONFIG += Release
 	CONFIG(debug, debug|release):CONFIG += Debug
 }
 
-Release:OUTPUT_DIR=release
-Debug:OUTPUT_DIR=debug
+Release:OUTPUT_DIR=release/x64
+Debug:OUTPUT_DIR=debug/x64
 
 DESTDIR  = ../bin/$${OUTPUT_DIR}
 OBJECTS_DIR = ../build/$${OUTPUT_DIR}/app
@@ -57,24 +57,25 @@ win*{
 }
 
 INCLUDEPATH += \
-	../cpputils/ \
-	../qtutils/ \
-	../github-releases-autoupdater/src/
+	../cpputils \
+	../qtutils \
+	../github-releases-autoupdater/src \
+	../cpp-template-utils
 
 
 SOURCES += main.cpp\
-    cmainwindow.cpp \
-    cproxyvideosurface.cpp \
-    settings/csettingspagecamera.cpp \
-    ccameraslist.cpp
+	cmainwindow.cpp \
+	cproxyvideosurface.cpp \
+	settings/csettingspagecamera.cpp \
+	ccameraslist.cpp
 
-HEADERS  += cmainwindow.h \
-    cproxyvideosurface.h \
-    settings/csettingspagecamera.h \
-    settings/settings.h \
-    ccameraslist.h \
-    version.h
+HEADERS += cmainwindow.h \
+	cproxyvideosurface.h \
+	settings/csettingspagecamera.h \
+	settings/settings.h \
+	ccameraslist.h \
+	version.h
 
-FORMS    += cmainwindow.ui \
-    settings/csettingspagecamera.ui \
-    ccameraslist.ui
+FORMS += cmainwindow.ui \
+	settings/csettingspagecamera.ui \
+	ccameraslist.ui
