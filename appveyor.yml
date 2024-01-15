@@ -7,7 +7,7 @@ environment:
     
 install:
 - git submodule update --init --recursive 
-- set QTDIR64=C:\Qt\%qt%\bin
+- set QTDIR64=C:\Qt\5.15.2\msvc2019_64\bin
 - cd installer
 - create_installer.bat
 build:
